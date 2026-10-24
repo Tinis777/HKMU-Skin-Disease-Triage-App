@@ -1,4 +1,5 @@
 Image_ID,Actual_Class,Predicted_Class,Correct?,Confidence(%),Inference_Time(ms)
+<<<<<<< HEAD
 ISIC_0024646.jpg,AKIEC,AKIEC,Yes,91.51,9.77
 ISIC_0024763.jpg,AKIEC,AKIEC,Yes,96.82,4.13
 ISIC_0025178.jpg,AKIEC,AKIEC,Yes,61.04,3.44
@@ -351,3 +352,4 @@ ISIC_0033817.jpg,VASC,VASC,Yes,99.97,3.68
 ISIC_0033991.jpg,VASC,VASC,Yes,100.00,3.52
 
 Total Images,350,Overall Accuracy,88.57%
+=======

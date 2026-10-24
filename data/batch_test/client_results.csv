@@ -1,4 +1,5 @@
 Image_ID,Actual_Class,Predicted_Class,Correct?,Client_ONNX_Confidence(%),Client_ONNX_Inference_Time(ms)
+<<<<<<< HEAD
 ISIC_0024646.jpg,AKIEC,AKIEC,Yes,91.51,2.17
 ISIC_0024763.jpg,AKIEC,AKIEC,Yes,96.82,1.64
 ISIC_0025178.jpg,AKIEC,AKIEC,Yes,61.04,1.32
@@ -351,3 +352,4 @@ ISIC_0033817.jpg,VASC,VASC,Yes,99.97,1.31
 ISIC_0033991.jpg,VASC,VASC,Yes,100.00,1.36
 
 Total Images,350,Overall ONNX Accuracy,88.57%
+=======
