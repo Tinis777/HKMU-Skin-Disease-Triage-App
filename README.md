@@ -27,8 +27,12 @@ The core research focus is a **Comparative Study** evaluating the computational 
 * **`data/batch_test/verify_sample.py`**: Validates the sampling results to ensure data integrity.
 
 ### 2. Batch Inference Testing
-* **`models/batch_test_model/cloud_batch_test.py`**: Simulates Cloud-side server environment using `best.pt` (PyTorch).
-* **`models/batch_test_model/client_batch_test.py`**: Simulates Client-side edge environment using `best.onnx` (ONNX Runtime).
+- **`models/batch_test_model/cloud_batch_test.py`**: Simulates Cloud-side server environment using `best.pt` (PyTorch).
+- **`models/batch_test_model/client_batch_test.py`**: Simulates Client-side edge environment using `best.onnx` (ONNX Runtime).
+- **`models/batch_test_model/pure_client_batch.py`**: A dedicated performance benchmarking script for validating Client-Side (Edge) inference feasibility. 
+  - **Purpose:** Isolates the exported `.onnx` model entirely from the heavy PyTorch/Ultralytics backend, accurately simulating a lightweight browser-based deployment environment.
+  - **Metrics Tracked:** Processes the unbiased test images using pure `onnxruntime` and `psutil` to extract the true **Peak Memory Usage (RAM in MB)** and **Average Inference Latency (ms)** without framework overhead.
+  - **Significance:** The empirical data generated directly justifies our architectural pivot to edge computing, proving the system can run on resource-constrained smartphones with zero server dependency.
 *(Test results are automatically exported to `cloud_results.csv` and `client_results.csv` for chart analysis.)*
 
 ### 3. Model Training & Export
