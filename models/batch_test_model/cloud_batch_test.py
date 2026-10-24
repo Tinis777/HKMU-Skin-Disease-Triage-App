@@ -1,5 +1,6 @@
 import os
 import csv
+import psutil
 from ultralytics import YOLO
 
 # 1. Load the trained PyTorch model
@@ -10,7 +11,11 @@ model = YOLO("models/batch_test_model/weights/best.pt")
 test_folder = "data/batch_test/test_images"
 output_csv = "data/batch_test/cloud_results.csv"
 
-# 3. Prepare CSV writer for Cloud results
+# 3. Initialize process tracking for memory usage
+process = psutil.Process(os.getpid())
+peak_memory_mb = 0.0
+
+# 4. Prepare CSV writer for Cloud results
 with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(["Image_ID", "Actual_Class", "Predicted_Class", "Correct?", "Cloud_PyTorch_Confidence(%)", "Cloud_PyTorch_Inference_Time(ms)"])
@@ -19,7 +24,7 @@ with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
     total_count = 0
     total_inference_time = 0.0
 
-    # 4. Iterate through subdirectories
+    # 5. Iterate through subdirectories
     for actual_class in os.listdir(test_folder):
         class_dir = os.path.join(test_folder, actual_class)
         
@@ -33,6 +38,11 @@ with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
                 # Run PyTorch inference
                 results = model(img_path, verbose=False)
                 result = results[0]
+
+                # Track peak memory during inference
+                current_mem = process.memory_info().rss / (1024 * 1024)
+                if current_mem > peak_memory_mb:
+                    peak_memory_mb = current_mem
 
                 # Extract prediction metrics
                 top1_index = result.probs.top1
@@ -52,7 +62,7 @@ with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
                 writer.writerow([img_name, actual_class.upper(), predicted_class.upper(), is_correct, f"{confidence:.2f}", f"{inference_time:.2f}"])
                 print(f"PyTorch Processed {img_name} -> Actual: {actual_class.upper():<5} | Predicted: {predicted_class.upper():<5} | Correct: {is_correct:<3} | Latency: {inference_time:.2f}ms")
 
-    # 5. Calculate and log overall PyTorch metrics
+    # 6. Calculate and log overall PyTorch metrics
     if total_count > 0:
         accuracy = (correct_count / total_count) * 100
         avg_inference_time = total_inference_time / total_count
@@ -62,6 +72,7 @@ with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
         print(f"Overall PyTorch Accuracy: {accuracy:.2f}%")
         print(f"Total Inference Time: {total_inference_time:.2f} ms")
         print(f"Average Time per Image: {avg_inference_time:.2f} ms")
+        print(f"Peak Memory Usage: {peak_memory_mb:.2f} MB")
         
         writer.writerow([])
         writer.writerow(["--- SUMMARY METRICS ---"])
@@ -69,5 +80,6 @@ with open(output_csv, mode='w', newline='', encoding='utf-8') as f:
         writer.writerow(["Overall PyTorch Accuracy(%)", f"{accuracy:.2f}"])
         writer.writerow(["Total Inference Time(ms)", f"{total_inference_time:.2f}"])
         writer.writerow(["Average Time per Image(ms)", f"{avg_inference_time:.2f}"])
+        writer.writerow(["Peak Memory Usage(MB)", f"{peak_memory_mb:.2f}"])
     else:
         print("No images found in the test folder.")
